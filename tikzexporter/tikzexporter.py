@@ -7,30 +7,42 @@ class TikZExporter:
             topology: Topology, target_filename: str = None,
             x_scale_factor: float = 1.0,
             y_scale_factor: float = 1.0,
+            x_shift: float = 0.0,
+            y_shift: float = 0.0,
             node_class: str = "",
             node_style: str = "",
             edge_class: str = "",
             edge_style: str = "",
         ):
-        node_str = TikZExporter._get_node_str(topology, x_scale_factor, y_scale_factor, node_class)
-        edge_str = TikZExporter._get_edge_str(topology, x_scale_factor, y_scale_factor, edge_class)
+        node_str = TikZExporter._get_node_str(topology, x_scale_factor, y_scale_factor, x_shift, y_shift, node_class)
+        edge_str = TikZExporter._get_edge_str(topology, x_scale_factor, y_scale_factor, x_shift, y_shift, edge_class)
         TikZExporter._print_result(target_filename, node_str, edge_str, node_style, edge_style)
 
     @staticmethod
-    def _get_node_str(topology: Topology, x_scale_factor: float, y_scale_factor: float, node_class: str):
+    def _get_node_str(topology: Topology,
+                      x_scale_factor: float,
+                      y_scale_factor: float,
+                      x_shift: float,
+                      y_shift: float,
+                      node_class: str):
         node_str = ""
         classes = "yaramonode"
         if node_class:
             classes += f", {node_class}"
         for node in topology.nodes.values():
-            x = node.geo_node.x * x_scale_factor
-            y = node.geo_node.y * y_scale_factor
+            x = node.geo_node.x * x_scale_factor + x_shift
+            y = node.geo_node.y * y_scale_factor + y_shift
             ident = TikZExporter._uuid_to_identifier(node.uuid)
             node_str += f"\t\\node[{classes}] ({ident}) at({x},{y}) {{}};\n"
         return node_str
 
     @staticmethod
-    def _get_edge_str(topology: Topology, x_scale_factor: float, y_scale_factor: float, edge_class: str):
+    def _get_edge_str(topology: Topology,
+                      x_scale_factor: float,
+                      y_scale_factor: float,
+                      x_shift: float,
+                      y_shift: float,
+                      edge_class: str):
         edge_str = ""
         classes = "yaramoedge"
         if edge_class:
@@ -40,8 +52,8 @@ class TikZExporter:
             b_ident = TikZExporter._uuid_to_identifier(edge.node_b.uuid)
             inter_geo_nodes_str = ""
             for inter_geo_node in edge.intermediate_geo_nodes:
-                x = inter_geo_node.x * x_scale_factor
-                y = inter_geo_node.y * y_scale_factor
+                x = inter_geo_node.x * x_scale_factor + x_shift
+                y = inter_geo_node.y * y_scale_factor + y_shift
                 inter_geo_nodes_str += f" ({x},{y}) --"
             edge_str += f"\t\\draw[{classes}] ({a_ident}) --{inter_geo_nodes_str} ({b_ident});\n"
         return edge_str
