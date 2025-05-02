@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "tikzexporter"
-version = "0.9"
+version = "1.0"
 description = "An exporter to a TikZ picture for LaTeX packages"
 authors = ["Arne Boockmeyer <arne.boockmeyer@hpi.de>"]
 readme = "README.md"
